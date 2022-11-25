@@ -1,7 +1,7 @@
 //
 import * as React from 'react';
 import * as WebBrowser from 'expo-web-browser';
-import {WebBrowserPresentationStyle} from 'expo-web-browser';
+import {openBrowserAsync, WebBrowserPresentationStyle} from 'expo-web-browser';
 import {
     exchangeCodeAsync,
     fetchUserInfoAsync,
@@ -20,11 +20,10 @@ WebBrowser.maybeCompleteAuthSession();
 
 const clientId = 'defmarket-client';
 const clientSecret = 'secret';
-const IPAddress = '192.168.224.41'
+const IPAddress = '192.168.1.3'
 const userPoolUrl = `http://${IPAddress}:9000`;
 const redirectUri = makeRedirectUri({
     path: '/authorized',
-    preferLocalhost: false,
 });
 
 WebBrowser.maybeCompleteAuthSession();
@@ -145,7 +144,12 @@ export default function App() {
         );
         console.log(revokeResponse);
         if (revokeResponse) {
-            setAuthTokens(null);
+            openBrowserAsync(userPoolUrl + '/logout', {}).then((res) => {
+                console.log("Logout Response ", res);
+                setAuthTokens(null);
+            }).catch((err) => {
+                console.log("Error 3 ", err)
+            });
         }
     };
     const getMessages = () => {
